@@ -1,0 +1,10 @@
+/*
+Theme Name: scmlondon new
+Theme URI: https://scmlondon.org/
+Description: New theme for the Slovak Catholic Mission London (Slovenská katolícka misia v Londýne). Replaces the legacy Weekly theme. CSS is currently inlined in header.php while the theme is being built out — this file exists to register the theme with WordPress.
+Author: SCM London
+Version: 0.1.0
+Text Domain: scmlondon-new
+*/
+
+/* Inline CSS lives in header.php for now. Move it here once the markup stabilises. */
