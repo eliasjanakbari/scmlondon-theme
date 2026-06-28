@@ -907,7 +907,7 @@ $theme_uri = get_template_directory_uri();
         .footer { background: var(--navy-dark); color: rgba(255,255,255,0.7); padding: 52px 0 0; margin-top: 0; }
         .footer-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
+            grid-template-columns: 2fr 1fr;
             gap: 48px;
             padding-bottom: 44px;
             border-bottom: 1px solid rgba(255,255,255,0.08);
