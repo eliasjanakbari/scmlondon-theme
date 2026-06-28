@@ -130,3 +130,150 @@ function scmnew_legacy_pages_nav() {
 function scmnew_nav_has_items( $nav ) {
     return is_string( $nav ) && false !== strpos( $nav, '<li' );
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+ * Front-page photo gallery — driven by a WordPress (Robo Gallery) gallery.
+ *
+ * The "Master Home Gallery" is an `rl_gallery` post (default ID 34696). Rather
+ * than depend on a specific Robo Gallery meta key — which has changed between
+ * plugin versions — we scan the gallery post's meta for the largest set of
+ * values that resolve to real image attachments. That set is the gallery.
+ * Override the ID with the `scm_master_gallery_id` filter if it ever changes.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/** Default ID of the "Master Home Gallery" rl_gallery post. */
+function scm_master_gallery_id() {
+    return (int) apply_filters( 'scm_master_gallery_id', 34696 );
+}
+
+/**
+ * Ordered list of images in the master gallery.
+ *
+ * @param int $gallery_id Optional. Defaults to scm_master_gallery_id().
+ * @return array[] Each item: [ 'id', 'full', 'thumb', 'alt' ]. Empty if none.
+ */
+function scm_get_master_gallery_images( $gallery_id = 0 ) {
+    $gallery_id = $gallery_id ? (int) $gallery_id : scm_master_gallery_id();
+    if ( ! $gallery_id ) {
+        return array();
+    }
+
+    $cache_key = 'scm_gallery_' . $gallery_id;
+    $cached    = get_transient( $cache_key );
+    if ( is_array( $cached ) ) {
+        return $cached;
+    }
+
+    $ids = scm_extract_gallery_image_ids( $gallery_id );
+
+    $images = array();
+    foreach ( $ids as $id ) {
+        $full = wp_get_attachment_image_url( $id, 'large' );
+        if ( ! $full ) {
+            continue;
+        }
+        $thumb = wp_get_attachment_image_url( $id, 'medium_large' );
+        $alt   = get_post_meta( $id, '_wp_attachment_image_alt', true );
+        $images[] = array(
+            'id'    => $id,
+            'full'  => $full,
+            'thumb' => $thumb ? $thumb : $full,
+            'alt'   => $alt ? $alt : '',
+        );
+    }
+
+    // Cache for a day; scm_flush_gallery_cache() busts it on gallery edits.
+    set_transient( $cache_key, $images, DAY_IN_SECONDS );
+    return $images;
+}
+
+/**
+ * Find the gallery's attachment IDs without hardcoding the plugin's meta key.
+ *
+ * Strategy: collect every candidate ID list we can find — child attachments by
+ * post_parent, plus any post-meta value that is an array or comma-separated
+ * string of integers — keep only IDs that are genuine image attachments, then
+ * return the largest such list (the actual gallery, not a stray single-ID meta
+ * such as a thumbnail). Order is preserved.
+ *
+ * @return int[]
+ */
+function scm_extract_gallery_image_ids( $gallery_id ) {
+    $candidates = array();
+
+    // Some galleries attach images to the gallery post itself.
+    $children = get_posts( array(
+        'post_type'      => 'attachment',
+        'post_mime_type' => 'image',
+        'post_parent'    => $gallery_id,
+        'numberposts'    => -1,
+        'orderby'        => 'menu_order',
+        'order'          => 'ASC',
+        'fields'         => 'ids',
+    ) );
+    if ( $children ) {
+        $candidates[] = $children;
+    }
+
+    // Scan all post meta for ID lists (Robo Gallery stores them here).
+    foreach ( get_post_meta( $gallery_id ) as $values ) {
+        foreach ( (array) $values as $raw ) {
+            $ids = scm_ids_from_meta_value( maybe_unserialize( $raw ) );
+            if ( $ids ) {
+                $candidates[] = $ids;
+            }
+        }
+    }
+
+    // Keep, per candidate list, only IDs that are real images; pick the biggest.
+    $best = array();
+    foreach ( $candidates as $list ) {
+        $valid = array();
+        foreach ( $list as $id ) {
+            $id = (int) $id;
+            if ( $id && ! in_array( $id, $valid, true ) && wp_attachment_is_image( $id ) ) {
+                $valid[] = $id;
+            }
+        }
+        if ( count( $valid ) > count( $best ) ) {
+            $best = $valid;
+        }
+    }
+
+    return $best;
+}
+
+/**
+ * Pull a flat list of integer IDs out of an arbitrary meta value: a flat or
+ * nested array of ints/['id'=>n] entries, or a comma-separated digit string.
+ *
+ * @return int[]
+ */
+function scm_ids_from_meta_value( $value ) {
+    $ids = array();
+
+    if ( is_array( $value ) ) {
+        foreach ( $value as $item ) {
+            if ( is_array( $item ) && isset( $item['id'] ) ) {
+                $ids[] = (int) $item['id'];
+            } elseif ( is_scalar( $item ) && ctype_digit( (string) $item ) ) {
+                $ids[] = (int) $item;
+            } elseif ( is_array( $item ) ) {
+                $ids = array_merge( $ids, scm_ids_from_meta_value( $item ) );
+            }
+        }
+    } elseif ( is_string( $value ) && preg_match( '/^\s*\d+(\s*,\s*\d+)*\s*$/', $value ) ) {
+        $ids = array_map( 'intval', preg_split( '/\s*,\s*/', trim( $value ) ) );
+    }
+
+    return $ids;
+}
+
+/** Bust the cached gallery whenever its post is saved/deleted. */
+function scm_flush_gallery_cache( $post_id ) {
+    if ( (int) $post_id === scm_master_gallery_id() ) {
+        delete_transient( 'scm_gallery_' . (int) $post_id );
+    }
+}
+add_action( 'save_post', 'scm_flush_gallery_cache' );
+add_action( 'deleted_post', 'scm_flush_gallery_cache' );

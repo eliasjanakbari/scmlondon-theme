@@ -317,15 +317,25 @@ document.addEventListener('click', function (e) {
 /* ═══════════════════════════════════════
    GALLERY
 ═══════════════════════════════════════ */
-const GALLERY_IMGS = [
-    window.SCM_THEME_URI + '/images/gallery1.jpg',
-    window.SCM_THEME_URI + '/images/gallery2.jpg',
-    window.SCM_THEME_URI + '/images/gallery3.jpg',
-    window.SCM_THEME_URI + '/images/gallery4.jpg',
-    window.SCM_THEME_URI + '/images/gallery5.jpg',
-    window.SCM_THEME_URI + '/images/gallery6.jpg',
-    window.SCM_THEME_URI + '/images/gallery7.jpg'
-];
+<?php
+/*
+ * Lightbox images come from the same WordPress "Master Home Gallery" source as
+ * the front-page grid, in the same order (so openLightbox(i) lines up). Falls
+ * back to the bundled theme images when the gallery is empty/unavailable.
+ */
+$lb_images = function_exists( 'scm_get_master_gallery_images' ) ? scm_get_master_gallery_images() : array();
+$lb_urls   = array();
+if ( ! empty( $lb_images ) ) {
+    foreach ( $lb_images as $lb_img ) {
+        $lb_urls[] = $lb_img['full'];
+    }
+} else {
+    for ( $g = 1; $g <= 7; $g++ ) {
+        $lb_urls[] = $theme_uri . '/images/gallery' . $g . '.jpg';
+    }
+}
+?>
+const GALLERY_IMGS = <?php echo wp_json_encode( $lb_urls ); ?>;
 
 let galleryPageIdx = 0;
 
@@ -335,6 +345,7 @@ function getGalleryPageCount() {
 function buildGalleryDots() {
     const count = getGalleryPageCount();
     const container = document.getElementById('galleryDots');
+    if (!container) return;
     container.innerHTML = '';
     for (let i = 0; i < count; i++) {
         const btn = document.createElement('button');
@@ -345,13 +356,16 @@ function buildGalleryDots() {
     }
 }
 function galleryGoTo(n) {
+    const inner = document.getElementById('galleryRightInner');
+    if (!inner) return;
     const total = getGalleryPageCount();
     galleryPageIdx = Math.max(0, Math.min(n, total - 1));
-    const inner = document.getElementById('galleryRightInner');
     const pageW = inner.parentElement.offsetWidth;
     inner.style.transform = 'translateX(-' + (galleryPageIdx * pageW) + 'px)';
-    document.getElementById('galleryNavPrev').disabled = galleryPageIdx === 0;
-    document.getElementById('galleryNavNext').disabled = galleryPageIdx >= total - 1;
+    const prev = document.getElementById('galleryNavPrev');
+    const next = document.getElementById('galleryNavNext');
+    if (prev) prev.disabled = galleryPageIdx === 0;
+    if (next) next.disabled = galleryPageIdx >= total - 1;
     document.querySelectorAll('#galleryDots .hero-dot').forEach((d, i) =>
         d.classList.toggle('active', i === galleryPageIdx));
 }

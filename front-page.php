@@ -292,13 +292,34 @@ $theme_uri = get_template_directory_uri();
         </div>
 
         <!-- ── Galéria fotografií ───────────────────────────── -->
+        <?php
+        /*
+         * Pull images from the WordPress "Master Home Gallery" (Robo Gallery).
+         * If it's empty/unavailable, fall back to the bundled theme images so
+         * the section is never broken. The first image is the large "featured"
+         * tile; the rest are paged 4-at-a-time in the grid on the right.
+         */
+        $gallery_images = function_exists( 'scm_get_master_gallery_images' ) ? scm_get_master_gallery_images() : array();
+
+        if ( empty( $gallery_images ) ) {
+            $gallery_images = array();
+            for ( $g = 1; $g <= 7; $g++ ) {
+                $url = $theme_uri . '/images/gallery' . $g . '.jpg';
+                $gallery_images[] = array( 'full' => $url, 'thumb' => $url, 'alt' => 'SCM Galéria' );
+            }
+        }
+
+        $featured     = $gallery_images[0];
+        $rest         = array_slice( $gallery_images, 1 );
+        $right_pages  = array_chunk( $rest, 4 );
+        ?>
         <section class="gallery-section">
             <h2 class="section-label">Galéria fotografií</h2>
 
             <div class="gallery-grid">
 
                 <div class="gallery-featured-wrap" onclick="openLightbox(0)">
-                    <img src="<?php echo esc_url( $theme_uri . '/images/gallery1.jpg' ); ?>" alt="SCM Galéria" onerror="this.style.display='none'">
+                    <img src="<?php echo esc_url( $featured['full'] ); ?>" alt="<?php echo esc_attr( $featured['alt'] ? $featured['alt'] : 'SCM Galéria' ); ?>" onerror="this.style.display='none'">
                     <div class="gallery-expand-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
@@ -310,22 +331,23 @@ $theme_uri = get_template_directory_uri();
                 <div class="gallery-right-wrap">
                     <div class="gallery-right-overflow">
                         <div class="gallery-right-inner" id="galleryRightInner">
+                            <?php
+                            $lb_index = 1; // featured tile is 0; right-grid tiles continue from 1
+                            foreach ( $right_pages as $page ) :
+                            ?>
                             <div class="gallery-right-page">
-                                <div class="gallery-right-cell" onclick="openLightbox(1)"><img src="<?php echo esc_url( $theme_uri . '/images/gallery2.jpg' ); ?>" alt="" loading="lazy" onerror="this.style.display='none'"></div>
-                                <div class="gallery-right-cell" onclick="openLightbox(2)"><img src="<?php echo esc_url( $theme_uri . '/images/gallery3.jpg' ); ?>" alt="" loading="lazy" onerror="this.style.display='none'"></div>
-                                <div class="gallery-right-cell" onclick="openLightbox(3)"><img src="<?php echo esc_url( $theme_uri . '/images/gallery4.jpg' ); ?>" alt="" loading="lazy" onerror="this.style.display='none'"></div>
-                                <div class="gallery-right-cell" onclick="openLightbox(4)"><img src="<?php echo esc_url( $theme_uri . '/images/gallery5.jpg' ); ?>" alt="" loading="lazy" onerror="this.style.display='none'"></div>
+                                <?php foreach ( $page as $img ) : ?>
+                                <div class="gallery-right-cell" onclick="openLightbox(<?php echo (int) $lb_index; ?>)"><img src="<?php echo esc_url( $img['thumb'] ); ?>" alt="<?php echo esc_attr( $img['alt'] ); ?>" loading="lazy" onerror="this.style.display='none'"></div>
+                                <?php $lb_index++; endforeach; ?>
                             </div>
-                            <div class="gallery-right-page">
-                                <div class="gallery-right-cell" onclick="openLightbox(5)"><img src="<?php echo esc_url( $theme_uri . '/images/gallery6.jpg' ); ?>" alt="" loading="lazy" onerror="this.style.display='none'"></div>
-                                <div class="gallery-right-cell" onclick="openLightbox(6)"><img src="<?php echo esc_url( $theme_uri . '/images/gallery7.jpg' ); ?>" alt="" loading="lazy" onerror="this.style.display='none'"></div>
-                            </div>
+                            <?php endforeach; ?>
                         </div>
                     </div>
                 </div>
 
             </div>
 
+            <?php if ( count( $right_pages ) > 1 ) : ?>
             <div class="gallery-right-controls">
                 <button class="gallery-nav-btn" id="galleryNavPrev" onclick="galleryRightNav(-1)" disabled aria-label="Predchádzajúce">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -335,6 +357,7 @@ $theme_uri = get_template_directory_uri();
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </button>
             </div>
+            <?php endif; ?>
         </section>
 
         <!-- ── Odporúčame ──────────────────────────────────── -->
