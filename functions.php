@@ -132,13 +132,13 @@ function scmnew_nav_has_items( $nav ) {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
- * Front-page photo gallery — driven by a WordPress (Robo Gallery) gallery.
+ * Front-page photo gallery — driven by the WordPress "Master Home Gallery".
  *
- * The "Master Home Gallery" is an `rl_gallery` post (default ID 34696). Rather
- * than depend on a specific Robo Gallery meta key — which has changed between
- * plugin versions — we scan the gallery post's meta for the largest set of
- * values that resolve to real image attachments. That set is the gallery.
- * Override the ID with the `scm_master_gallery_id` filter if it ever changes.
+ * That gallery is a Robo Gallery (`rl_gallery`) post, default ID 34696. We read
+ * Robo Gallery's curated selection list (the `_rl_images` meta), so the theme
+ * shows exactly the images you've selected in the gallery editor — in that
+ * order — and updates automatically as you add, remove, or reorder them.
+ * Override the post ID with the `scm_master_gallery_id` filter if it changes.
  * ──────────────────────────────────────────────────────────────────────── */
 
 /** Default ID of the "Master Home Gallery" rl_gallery post. */
@@ -158,13 +158,19 @@ function scm_get_master_gallery_images( $gallery_id = 0 ) {
         return array();
     }
 
-    $cache_key = 'scm_gallery_' . $gallery_id;
+    $cache_key = 'scm_gallery_v3_' . $gallery_id;
     $cached    = get_transient( $cache_key );
     if ( is_array( $cached ) ) {
         return $cached;
     }
 
-    $ids = scm_extract_gallery_image_ids( $gallery_id );
+    // Robo Gallery's curated selection — exactly the images chosen in the
+    // gallery editor, in that order. Add more there and they appear here.
+    $ids = array();
+    $rl  = maybe_unserialize( get_post_meta( $gallery_id, '_rl_images', true ) );
+    if ( is_array( $rl ) && ! empty( $rl['media']['attachments']['ids'] ) ) {
+        $ids = array_map( 'intval', (array) $rl['media']['attachments']['ids'] );
+    }
 
     $images = array();
     foreach ( $ids as $id ) {
@@ -187,139 +193,10 @@ function scm_get_master_gallery_images( $gallery_id = 0 ) {
     return $images;
 }
 
-/**
- * Find the gallery's attachment IDs without hardcoding the plugin's meta key.
- *
- * Strategy: collect every candidate ID list we can find — child attachments by
- * post_parent, plus any post-meta value that is an array or comma-separated
- * string of integers — keep only IDs that are genuine image attachments, then
- * return the largest such list (the actual gallery, not a stray single-ID meta
- * such as a thumbnail). Order is preserved.
- *
- * @return int[]
- */
-function scm_extract_gallery_image_ids( $gallery_id ) {
-    $candidates = array();
-
-    // Some galleries attach images to the gallery post itself.
-    $children = get_posts( array(
-        'post_type'      => 'attachment',
-        'post_mime_type' => 'image',
-        'post_parent'    => $gallery_id,
-        'numberposts'    => -1,
-        'orderby'        => 'menu_order',
-        'order'          => 'ASC',
-        'fields'         => 'ids',
-    ) );
-    if ( $children ) {
-        $candidates[] = $children;
-    }
-
-    // Scan all post meta for ID lists (Robo Gallery stores them here).
-    foreach ( get_post_meta( $gallery_id ) as $values ) {
-        foreach ( (array) $values as $raw ) {
-            $ids = scm_ids_from_meta_value( maybe_unserialize( $raw ) );
-            if ( $ids ) {
-                $candidates[] = $ids;
-            }
-        }
-    }
-
-    // Keep, per candidate list, only IDs that are real images; pick the biggest.
-    $best = array();
-    foreach ( $candidates as $list ) {
-        $valid = array();
-        foreach ( $list as $id ) {
-            $id = (int) $id;
-            if ( $id && ! in_array( $id, $valid, true ) && wp_attachment_is_image( $id ) ) {
-                $valid[] = $id;
-            }
-        }
-        if ( count( $valid ) > count( $best ) ) {
-            $best = $valid;
-        }
-    }
-
-    return $best;
-}
-
-/**
- * Pull a flat list of integer IDs out of an arbitrary meta value: a flat or
- * nested array of ints/['id'=>n] entries, or a comma-separated digit string.
- *
- * @return int[]
- */
-function scm_ids_from_meta_value( $value ) {
-    $ids = array();
-
-    if ( is_array( $value ) ) {
-        foreach ( $value as $item ) {
-            if ( is_array( $item ) && isset( $item['id'] ) ) {
-                $ids[] = (int) $item['id'];
-            } elseif ( is_scalar( $item ) && ctype_digit( (string) $item ) ) {
-                $ids[] = (int) $item;
-            } elseif ( is_array( $item ) ) {
-                $ids = array_merge( $ids, scm_ids_from_meta_value( $item ) );
-            }
-        }
-    } elseif ( is_string( $value ) && preg_match( '/^\s*\d+(\s*,\s*\d+)*\s*$/', $value ) ) {
-        $ids = array_map( 'intval', preg_split( '/\s*,\s*/', trim( $value ) ) );
-    }
-
-    return $ids;
-}
-
-/**
- * TEMPORARY diagnostic — remove once the Robo Gallery meta key is identified.
- *
- * Visit any front-end URL while logged in as an admin with ?scm_gallery_debug=1
- * appended, e.g.  https://your-site/?scm_gallery_debug=1
- * It prints every meta key on the gallery post plus a preview of each value,
- * so we can see exactly where Robo Gallery stores the image IDs.
- */
-function scm_gallery_debug() {
-    if ( empty( $_GET['scm_gallery_debug'] ) || ! current_user_can( 'manage_options' ) ) {
-        return;
-    }
-
-    $gallery_id = scm_master_gallery_id();
-    header( 'Content-Type: text/plain; charset=utf-8' );
-
-    echo "=== SCM gallery debug for post ID {$gallery_id} ===\n\n";
-
-    $post = get_post( $gallery_id );
-    echo 'Post exists: ' . ( $post ? "yes (type={$post->post_type}, title=\"{$post->post_title}\")" : 'NO' ) . "\n";
-
-    $children = get_posts( array(
-        'post_type'      => 'attachment',
-        'post_mime_type' => 'image',
-        'post_parent'    => $gallery_id,
-        'numberposts'    => -1,
-        'fields'         => 'ids',
-    ) );
-    echo 'Child image attachments (post_parent): ' . count( $children ) . "\n\n";
-
-    echo "--- post meta ---\n";
-    foreach ( get_post_meta( $gallery_id ) as $key => $values ) {
-        foreach ( (array) $values as $raw ) {
-            $val     = maybe_unserialize( $raw );
-            $ids     = scm_ids_from_meta_value( $val );
-            $preview = is_scalar( $val ) ? substr( (string) $val, 0, 200 ) : wp_json_encode( $val );
-            echo "[{$key}]\n";
-            echo '  type: ' . gettype( $val ) . ( is_array( $val ) ? ' (count=' . count( $val ) . ')' : '' ) . "\n";
-            echo '  ids found: ' . ( $ids ? implode( ',', $ids ) : '(none)' ) . "\n";
-            echo '  preview: ' . substr( (string) $preview, 0, 300 ) . "\n\n";
-        }
-    }
-
-    exit;
-}
-add_action( 'template_redirect', 'scm_gallery_debug' );
-
 /** Bust the cached gallery whenever its post is saved/deleted. */
 function scm_flush_gallery_cache( $post_id ) {
     if ( (int) $post_id === scm_master_gallery_id() ) {
-        delete_transient( 'scm_gallery_' . (int) $post_id );
+        delete_transient( 'scm_gallery_v3_' . (int) $post_id );
     }
 }
 add_action( 'save_post', 'scm_flush_gallery_cache' );
