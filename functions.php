@@ -158,7 +158,7 @@ function scm_get_master_gallery_images( $gallery_id = 0 ) {
         return array();
     }
 
-    $cache_key = 'scm_gallery_v3_' . $gallery_id;
+    $cache_key = 'scm_gallery_v4_' . $gallery_id;
     $cached    = get_transient( $cache_key );
     if ( is_array( $cached ) ) {
         return $cached;
@@ -170,6 +170,8 @@ function scm_get_master_gallery_images( $gallery_id = 0 ) {
     $rl  = maybe_unserialize( get_post_meta( $gallery_id, '_rl_images', true ) );
     if ( is_array( $rl ) && ! empty( $rl['media']['attachments']['ids'] ) ) {
         $ids = array_map( 'intval', (array) $rl['media']['attachments']['ids'] );
+        // Show newest-selected first: reverse the gallery's selection order.
+        $ids = array_reverse( $ids );
     }
 
     $images = array();
@@ -196,7 +198,7 @@ function scm_get_master_gallery_images( $gallery_id = 0 ) {
 /** Bust the cached gallery whenever its post is saved/deleted. */
 function scm_flush_gallery_cache( $post_id ) {
     if ( (int) $post_id === scm_master_gallery_id() ) {
-        delete_transient( 'scm_gallery_v3_' . (int) $post_id );
+        delete_transient( 'scm_gallery_v4_' . (int) $post_id );
     }
 }
 add_action( 'save_post', 'scm_flush_gallery_cache' );
