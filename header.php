@@ -957,7 +957,6 @@ $theme_uri = get_template_directory_uri();
         <?php
         wp_nav_menu( array(
             'theme_location'  => 'header-pages',
-            'menu'            => 'dobrodinci', // used when no menu is assigned to the location
             'container'       => false,
             'menu_class'      => 'nav-links',
             'menu_id'         => 'navLinks',
