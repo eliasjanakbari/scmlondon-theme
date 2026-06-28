@@ -131,6 +131,30 @@ $theme_uri = get_template_directory_uri();
         .nav-links li.current-menu-item > a,
         .nav-links li.current_page_item > a { color: var(--gold); background: rgba(201,162,39,0.1); }
 
+        /* Dropdowns (sub-menus set in WordPress → Appearance → Menus) */
+        .nav-links li { position: relative; }
+        .nav-links .menu-item-has-children > a::after {
+            content: ""; display: inline-block; margin-left: 6px;
+            border: 4px solid transparent; border-top-color: currentColor;
+            transform: translateY(2px); transition: transform var(--ease);
+        }
+        .nav-links .sub-menu {
+            position: absolute; top: 100%; left: 0; min-width: 200px;
+            background: var(--navy-dark); border-radius: 6px;
+            box-shadow: 0 10px 28px rgba(0,0,0,0.28);
+            padding: 6px; list-style: none; margin: 0;
+            display: flex; flex-direction: column; gap: 2px;
+            opacity: 0; visibility: hidden; transform: translateY(8px);
+            transition: opacity var(--ease), transform var(--ease), visibility var(--ease);
+            z-index: 1001;
+        }
+        .nav-links li:hover > .sub-menu,
+        .nav-links li:focus-within > .sub-menu {
+            opacity: 1; visibility: visible; transform: translateY(0);
+        }
+        .nav-links .menu-item-has-children:hover > a::after { transform: translateY(2px) rotate(180deg); }
+        .nav-links .sub-menu a { display: block; text-transform: none; letter-spacing: 0; font-size: 0.8rem; }
+
         /* Translate button */
         .btn-translate {
             margin-left: 14px;
@@ -911,6 +935,14 @@ $theme_uri = get_template_directory_uri();
             }
             .nav-links.open { display: flex; }
             .nav-links a { padding: 10px 12px; font-size: 0.85rem; }
+            /* Sub-menus stack inline on mobile instead of floating */
+            .nav-links .sub-menu {
+                position: static; opacity: 1; visibility: visible; transform: none;
+                box-shadow: none; background: transparent; padding: 0 0 0 14px;
+                display: none;
+            }
+            .nav-links .menu-item-has-children.open > .sub-menu { display: flex; }
+            .nav-links .menu-item-has-children > a::after { float: right; }
             .hamburger { display: flex; }
             .btn-translate { padding: 6px 10px; }
             .hero { height: 360px; }
@@ -957,11 +989,12 @@ $theme_uri = get_template_directory_uri();
         <?php
         wp_nav_menu( array(
             'theme_location'  => 'header-pages',
+            'menu'            => 'dobrodinci', // used when no menu is assigned to the location
             'container'       => false,
             'menu_class'      => 'nav-links',
             'menu_id'         => 'navLinks',
             'fallback_cb'     => 'scmnew_default_nav',
-            'depth'           => 1,
+            'depth'           => 2,
         ) );
         ?>
 

@@ -299,6 +299,20 @@ function toggleNav() {
     document.getElementById('navLinks').classList.toggle('open');
 }
 
+/* On mobile, tapping a menu item that has a sub-menu expands it
+   instead of navigating straight away (first tap opens, link still
+   reachable via its own entry). Desktop uses CSS hover, untouched. */
+document.addEventListener('click', function (e) {
+    if (window.innerWidth > 768) return;
+    var link = e.target.closest('.nav-links .menu-item-has-children > a');
+    if (!link) return;
+    var li = link.parentElement;
+    if (!li.classList.contains('open')) {
+        e.preventDefault();
+        li.classList.add('open');
+    }
+});
+
 
 /* ═══════════════════════════════════════
    GALLERY
