@@ -203,3 +203,87 @@ function scm_flush_gallery_cache( $post_id ) {
 }
 add_action( 'save_post', 'scm_flush_gallery_cache' );
 add_action( 'deleted_post', 'scm_flush_gallery_cache' );
+
+/* ─────────────────────────────────────────────────────────────────────────
+ * Front-page "Správy" (News) — driven by the "Pinned News" post tag.
+ *
+ * Any published post tagged "Pinned News" appears in the news section, newest
+ * first. The latest becomes the large featured card; the rest fill the
+ * slideshow. Tag an existing post and it shows up automatically.
+ *
+ * The tag is matched by slug, name, or term ID so it keeps working regardless
+ * of how the tag was created (e.g. "Pinned News" → slug "pinned-news").
+ * Override the lookup with the `scm_pinned_news_tag` filter if needed.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/** Resolve the "Pinned News" tag term, trying slug then name. Null if absent. */
+function scm_pinned_news_term() {
+    $wanted = apply_filters( 'scm_pinned_news_tag', 'Pinned News' );
+
+    $term = get_term_by( 'slug', sanitize_title( $wanted ), 'post_tag' );
+    if ( ! $term ) {
+        $term = get_term_by( 'name', $wanted, 'post_tag' );
+    }
+    return $term ? $term : null;
+}
+
+/**
+ * Published posts tagged "Pinned News", newest first.
+ *
+ * @param int $limit Max posts to return. Default 5 (1 featured + 4 slideshow).
+ * @return WP_Post[] Empty if the tag is missing or has no posts.
+ */
+function scm_get_pinned_news( $limit = 5 ) {
+    $term = scm_pinned_news_term();
+    if ( ! $term ) {
+        return array();
+    }
+
+    return get_posts( array(
+        'post_type'        => 'post',
+        'post_status'      => 'publish',
+        'posts_per_page'   => (int) $limit,
+        'tax_query'        => array( array(
+            'taxonomy' => 'post_tag',
+            'field'    => 'term_id',
+            'terms'    => $term->term_id,
+        ) ),
+        'ignore_sticky_posts' => true,
+    ) );
+}
+
+/**
+ * Render one news card's inner markup (image, meta, title, excerpt, link).
+ *
+ * @param WP_Post $post     The post to render.
+ * @param string  $heading  Heading tag for the title ('h2' for featured, else 'h3').
+ */
+function scm_render_news_card( $post, $heading = 'h3' ) {
+    $theme_uri = get_template_directory_uri();
+    $title     = get_the_title( $post );
+    $img       = get_the_post_thumbnail_url( $post, 'large' );
+    if ( ! $img ) {
+        $img = $theme_uri . '/images/slide1.jpg';
+    }
+
+    $cats = get_the_category( $post->ID );
+    $cat  = ! empty( $cats ) ? $cats[0]->name : '';
+
+    $heading = in_array( $heading, array( 'h2', 'h3' ), true ) ? $heading : 'h3';
+    ?>
+    <div class="card-img">
+        <img src="<?php echo esc_url( $img ); ?>" alt="<?php echo esc_attr( $title ); ?>">
+    </div>
+    <div class="card-body">
+        <div class="card-meta">
+            <span class="card-date"><?php echo esc_html( get_the_date( 'j. F Y', $post ) ); ?></span>
+            <?php if ( $cat ) : ?>
+                <span class="card-cat"><?php echo esc_html( $cat ); ?></span>
+            <?php endif; ?>
+        </div>
+        <<?php echo $heading; ?>><?php echo esc_html( $title ); ?></<?php echo $heading; ?>>
+        <p><?php echo esc_html( get_the_excerpt( $post ) ); ?></p>
+        <a href="<?php echo esc_url( get_permalink( $post ) ); ?>" class="card-link">Čítať viac →</a>
+    </div>
+    <?php
+}

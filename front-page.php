@@ -62,85 +62,28 @@ $theme_uri = get_template_directory_uri();
 
                 <div class="news-grid">
 
+                    <?php
+                    $pinned_news = scm_get_pinned_news( 5 );
+                    $featured    = ! empty( $pinned_news ) ? array_shift( $pinned_news ) : null;
+                    ?>
+
+                    <?php if ( $featured ) : ?>
                     <!-- Featured -->
                     <article class="card featured">
-                        <div class="card-img">
-                            <img src="<?php echo esc_url( $theme_uri . '/images/slide2.jpg' ); ?>" alt="Veľká noc 2026">
-                        </div>
-                        <div class="card-body">
-                            <div class="card-meta">
-                                <span class="card-date">14. apríla 2026</span>
-                                <span class="card-cat">Liturgia</span>
-                            </div>
-                            <h2>Veľká noc 2026 – Program bohoslužieb</h2>
-                            <p>Pozývame všetkých veriacich na slávnostné bohoslužby počas Veľkonočného trojdnia. Detailný program nájdete v sekcii Bohoslužby alebo na nástenke v kostole.</p>
-                            <a href="velka-noc-2026.html" class="card-link">Čítať viac →</a>
-                        </div>
+                        <?php scm_render_news_card( $featured, 'h2' ); ?>
                     </article>
+                    <?php endif; ?>
 
+                    <?php if ( ! empty( $pinned_news ) ) : ?>
                     <div class="cards-slideshow-outer">
                         <div class="cards-overflow">
                                 <div class="cards-track" id="cardsTrack">
 
+                                    <?php foreach ( $pinned_news as $news_post ) : ?>
                                     <article class="card">
-                                        <div class="card-img">
-                                            <img src="<?php echo esc_url( $theme_uri . '/images/slide1.jpg' ); ?>" alt="Stretnutie rodín">
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="card-meta">
-                                                <span class="card-date">10. apríla 2026</span>
-                                                <span class="card-cat">Komunita</span>
-                                            </div>
-                                            <h3>Stretnutie rodín – apríl 2026</h3>
-                                            <p>Mesačné neformálne stretnutie rodín s deťmi v priestoroch farnosti.</p>
-                                            <a href="#" class="card-link">Čítať viac →</a>
-                                        </div>
+                                        <?php scm_render_news_card( $news_post, 'h3' ); ?>
                                     </article>
-
-                                    <article class="card">
-                                        <div class="card-img">
-                                            <img src="<?php echo esc_url( $theme_uri . '/images/slide4.webp' ); ?>" alt="Biblický krúžok">
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="card-meta">
-                                                <span class="card-date">5. apríla 2026</span>
-                                                <span class="card-cat">Formácia</span>
-                                            </div>
-                                            <h3>Biblický krúžok – jar 2026</h3>
-                                            <p>Pokračovanie štúdia Svätého písma každý štvrtok večer. Noví účastníci vítaní.</p>
-                                            <a href="#" class="card-link">Čítať viac →</a>
-                                        </div>
-                                    </article>
-
-                                    <article class="card">
-                                        <div class="card-img">
-                                            <img src="<?php echo esc_url( $theme_uri . '/images/slide1.jpg' ); ?>" alt="Stretnutie rodín">
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="card-meta">
-                                                <span class="card-date">10. apríla 2026</span>
-                                                <span class="card-cat">Komunita</span>
-                                            </div>
-                                            <h3>Stretnutie rodín – apríl 2026</h3>
-                                            <p>Mesačné neformálne stretnutie rodín s deťmi v priestoroch farnosti.</p>
-                                            <a href="#" class="card-link">Čítať viac →</a>
-                                        </div>
-                                    </article>
-
-                                    <article class="card">
-                                        <div class="card-img">
-                                            <img src="<?php echo esc_url( $theme_uri . '/images/slide4.webp' ); ?>" alt="Biblický krúžok">
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="card-meta">
-                                                <span class="card-date">5. apríla 2026</span>
-                                                <span class="card-cat">Formácia</span>
-                                            </div>
-                                            <h3>Biblický krúžok – jar 2026</h3>
-                                            <p>Pokračovanie štúdia Svätého písma každý štvrtok večer. Noví účastníci vítaní.</p>
-                                            <a href="#" class="card-link">Čítať viac →</a>
-                                        </div>
-                                    </article>
+                                    <?php endforeach; ?>
 
                                 </div>
                         </div>
@@ -155,6 +98,7 @@ $theme_uri = get_template_directory_uri();
                             </button>
                         </div>
                     </div>
+                    <?php endif; ?>
 
                     <!-- NEDEĽNÉ OZNAMY — full width, bottom row -->
                     <article class="card bulletin-card">
