@@ -1037,7 +1037,7 @@ $theme_uri = get_template_directory_uri();
                     <path d="M8,4 H10 V7 H13.5 V9 H10 V11 H12.5 V13 H10 V19 H8 V13 H5.5 V11 H8 V9 H4.5 V7 H8 Z" fill="#fff"/>
                 </g>
             </svg>
-            <span class="lang-label">EN</span>
+            <span class="lang-label notranslate" translate="no">EN</span>
         </button>
 
         <button class="hamburger" id="hamburger" onclick="toggleNav()" aria-label="Menu">
