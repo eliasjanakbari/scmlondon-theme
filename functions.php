@@ -253,18 +253,39 @@ function scm_get_pinned_news( $limit = 5 ) {
 }
 
 /**
+ * Best image to represent a news post on the front page.
+ *
+ * Order of preference:
+ *   1. The post's featured image.
+ *   2. The first <img> embedded in the post content.
+ *   3. A theme fallback so the card never breaks.
+ *
+ * @param WP_Post $post The post.
+ * @return string Image URL.
+ */
+function scm_news_card_image( $post ) {
+    $img = get_the_post_thumbnail_url( $post, 'large' );
+    if ( $img ) {
+        return $img;
+    }
+
+    // Pull the first image embedded in the post content.
+    if ( preg_match( '/<img[^>]+src=["\']([^"\']+)["\']/i', $post->post_content, $m ) ) {
+        return $m[1];
+    }
+
+    return get_template_directory_uri() . '/images/slide1.jpg';
+}
+
+/**
  * Render one news card's inner markup (image, meta, title, excerpt, link).
  *
  * @param WP_Post $post     The post to render.
  * @param string  $heading  Heading tag for the title ('h2' for featured, else 'h3').
  */
 function scm_render_news_card( $post, $heading = 'h3' ) {
-    $theme_uri = get_template_directory_uri();
-    $title     = get_the_title( $post );
-    $img       = get_the_post_thumbnail_url( $post, 'large' );
-    if ( ! $img ) {
-        $img = $theme_uri . '/images/slide1.jpg';
-    }
+    $title = get_the_title( $post );
+    $img   = scm_news_card_image( $post );
 
     $cats = get_the_category( $post->ID );
     $cat  = ! empty( $cats ) ? $cats[0]->name : '';
