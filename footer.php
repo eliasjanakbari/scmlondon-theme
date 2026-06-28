@@ -26,28 +26,12 @@ $theme_uri = get_template_directory_uri();
             </div>
 
             <div class="footer-col">
-                <h4>Rýchle linky</h4>
-                <nav class="footer-links">
-                    <a href="#">Domov</a>
-                    <a href="#">O nás</a>
-                    <a href="#">Bohoslužby</a>
-                    <a href="#">Sviatosti</a>
-                    <a href="#">Podujatia</a>
-                    <a href="#">Správy</a>
-                    <a href="#">Registrácia</a>
-                    <a href="#">Inzercia</a>
-                    <a href="#">Ubytovania</a>
-                    <a href="#">Archív</a>
-                </nav>
-            </div>
-
-            <div class="footer-col">
                 <h4>Kontakt</h4>
                 <div class="footer-contact-row">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
                     </svg>
-                    <span>Velehrad, London</span>
+                    <span>14 Melior Street, SE1 3QP</span>
                 </div>
                 <div class="footer-contact-row">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -57,7 +41,7 @@ $theme_uri = get_template_directory_uri();
                     <a href="mailto:info@scmlondon.org" style="color:rgba(255,255,255,0.6)">info@scmlondon.org</a>
                 </div>
                 <div style="margin-top:18px;">
-                    <a href="#" class="btn-primary" style="width:auto;padding:8px 16px;font-size:0.8rem;">Napísať nám</a>
+                    <a href="mailto:info@scmlondon.org" class="btn-primary" style="width:auto;padding:8px 16px;font-size:0.8rem;">Napísať nám</a>
                 </div>
             </div>
 
