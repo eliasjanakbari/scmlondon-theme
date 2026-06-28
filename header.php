@@ -131,6 +131,37 @@ $theme_uri = get_template_directory_uri();
         .nav-links li.current-menu-item > a,
         .nav-links li.current_page_item > a { color: var(--gold); background: rgba(201,162,39,0.1); }
 
+        /* Dropdowns — works for both WP menus (.sub-menu/.menu-item-has-children)
+           and the legacy page list (.children/.page_item_has_children). */
+        .nav-links li { position: relative; }
+        .nav-links .menu-item-has-children > a::after,
+        .nav-links .page_item_has_children > a::after {
+            content: ""; display: inline-block; margin-left: 6px;
+            border: 4px solid transparent; border-top-color: currentColor;
+            transform: translateY(2px); transition: transform var(--ease);
+        }
+        .nav-links .sub-menu,
+        .nav-links .children {
+            position: absolute; top: 100%; left: 0; min-width: 210px;
+            background: var(--navy-dark); border-radius: 6px;
+            box-shadow: 0 10px 28px rgba(0,0,0,0.28);
+            padding: 6px; list-style: none; margin: 0;
+            display: flex; flex-direction: column; gap: 2px;
+            opacity: 0; visibility: hidden; transform: translateY(8px);
+            transition: opacity var(--ease), transform var(--ease), visibility var(--ease);
+            z-index: 1001;
+        }
+        .nav-links li:hover > .sub-menu,
+        .nav-links li:hover > .children,
+        .nav-links li:focus-within > .sub-menu,
+        .nav-links li:focus-within > .children {
+            opacity: 1; visibility: visible; transform: translateY(0);
+        }
+        .nav-links .menu-item-has-children:hover > a::after,
+        .nav-links .page_item_has_children:hover > a::after { transform: translateY(2px) rotate(180deg); }
+        .nav-links .sub-menu a,
+        .nav-links .children a { display: block; text-transform: none; letter-spacing: 0; font-size: 0.8rem; }
+
         /* Translate button */
         .btn-translate {
             margin-left: 14px;
@@ -911,6 +942,17 @@ $theme_uri = get_template_directory_uri();
             }
             .nav-links.open { display: flex; }
             .nav-links a { padding: 10px 12px; font-size: 0.85rem; }
+            /* Sub-menus stack inline on mobile, expanded by tap */
+            .nav-links .sub-menu,
+            .nav-links .children {
+                position: static; opacity: 1; visibility: visible; transform: none;
+                box-shadow: none; background: transparent; padding: 0 0 0 14px;
+                display: none;
+            }
+            .nav-links .menu-item-has-children.open > .sub-menu,
+            .nav-links .page_item_has_children.open > .children { display: flex; }
+            .nav-links .menu-item-has-children > a::after,
+            .nav-links .page_item_has_children > a::after { float: right; }
             .hamburger { display: flex; }
             .btn-translate { padding: 6px 10px; }
             .hero { height: 360px; }

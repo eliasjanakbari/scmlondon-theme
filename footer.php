@@ -304,7 +304,7 @@ function toggleNav() {
    reachable via its own entry). Desktop uses CSS hover, untouched. */
 document.addEventListener('click', function (e) {
     if (window.innerWidth > 768) return;
-    var link = e.target.closest('.nav-links .menu-item-has-children > a');
+    var link = e.target.closest('.nav-links .menu-item-has-children > a, .nav-links .page_item_has_children > a');
     if (!link) return;
     var li = link.parentElement;
     if (!li.classList.contains('open')) {

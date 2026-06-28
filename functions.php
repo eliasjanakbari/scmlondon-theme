@@ -61,17 +61,6 @@ function scmnew_default_nav() {
  * missing/empty location assignment.
  */
 function scmnew_header_nav() {
-    // TEMP DIAGNOSTIC: print every menu (name | slug | item count) as an HTML
-    // comment so we can see the real menu name. Remove once the nav works.
-    $debug = "\n<!-- SCM MENU DEBUG\n";
-    foreach ( wp_get_nav_menus() as $m ) {
-        $debug .= sprintf( "menu: name=%s | slug=%s | id=%d | items=%d\n", $m->name, $m->slug, $m->term_id, (int) $m->count );
-    }
-    $locs = get_nav_menu_locations();
-    $debug .= 'locations: ' . wp_json_encode( $locs ) . "\n";
-    $debug .= "-->\n";
-    echo $debug; // phpcs:ignore
-
     $base = array(
         'container'   => false,
         'menu_class'  => 'nav-links',
@@ -99,12 +88,42 @@ function scmnew_header_nav() {
         }
     }
 
-    // 3. Output, or fall back to the built-in list.
+    // 3. Match the legacy template: auto-list of Pages (minus the excluded set).
+    if ( ! scmnew_nav_has_items( $nav ) ) {
+        $nav = scmnew_legacy_pages_nav();
+    }
+
+    // 4. Output, or fall back to the built-in list so the bar is never empty.
     if ( scmnew_nav_has_items( $nav ) ) {
-        echo $nav; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_nav_menu output is already escaped.
+        echo $nav; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- already escaped by core.
     } else {
         scmnew_default_nav();
     }
+}
+
+/**
+ * Re-creates the legacy theme's automatic page navigation: every published
+ * Page except the historically-excluded set, in page order, with the old
+ * page_id=14 → cat=28 redirect preserved. Returns the markup as a string.
+ */
+function scmnew_legacy_pages_nav() {
+    $links = wp_list_pages( array(
+        'echo'         => 0,
+        'title_li'     => '',
+        'sort_column'  => 'menu_order, post_title',
+        'exclude_tree' => 18877,
+        'exclude'      => '13039,10151,10152,10153,10158,10150,10156,10157,18886,18903',
+    ) );
+
+    if ( ! $links ) {
+        return '';
+    }
+
+    // Legacy hack carried over from the old header: point the page_id=14 item
+    // at category 28 instead of its own page.
+    $links = str_replace( '/?page_id=14', '/?cat=28', $links );
+
+    return '<ul class="nav-links" id="navLinks">' . $links . '</ul>';
 }
 
 /** True only when a wp_nav_menu() string actually contains list items. */
