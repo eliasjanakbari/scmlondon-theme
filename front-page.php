@@ -100,6 +100,11 @@ $theme_uri = get_template_directory_uri();
                     </div>
                     <?php endif; ?>
 
+                    <?php
+                    $bulletins      = scm_get_bulletins( 6 );
+                    $latest_oznam   = ! empty( $bulletins ) ? array_shift( $bulletins ) : null;
+                    ?>
+                    <?php if ( $latest_oznam ) : ?>
                     <!-- NEDEĽNÉ OZNAMY — full width, bottom row -->
                     <article class="card bulletin-card">
                         <div class="bulletin-header">
@@ -116,7 +121,7 @@ $theme_uri = get_template_directory_uri();
                             </div>
                         </div>
                         <div class="bulletin-body">
-                            <a href="oznamy/oznamy-2026-04-26.pdf" class="bulletin-latest" target="_blank" rel="noopener" title="Otvoriť bulletin 26. 4. 2026">
+                            <a href="<?php echo esc_url( $latest_oznam['url'] ); ?>" class="bulletin-latest" target="_blank" rel="noopener" title="<?php echo esc_attr( 'Otvoriť bulletin ' . $latest_oznam['date'] ); ?>">
                                 <div class="bulletin-latest-icon">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
@@ -124,7 +129,7 @@ $theme_uri = get_template_directory_uri();
                                     </svg>
                                 </div>
                                 <div class="bulletin-latest-info">
-                                    <span class="bdate">26. apríla 2026</span>
+                                    <span class="bdate"><?php echo esc_html( $latest_oznam['date'] ); ?></span>
                                     <span class="blabel">Najnovšie vydanie</span>
                                 </div>
                                 <div class="bulletin-dl-icon">
@@ -136,34 +141,25 @@ $theme_uri = get_template_directory_uri();
                                 </div>
                             </a>
 
+                            <?php if ( ! empty( $bulletins ) ) : ?>
                             <div class="bulletin-prev-section">
                             <p class="bulletin-prev-label">Predchádzajúce vydania</p>
                             <div class="bulletin-prev-list">
-                                <a href="oznamy/oznamy-2026-04-19.pdf" class="bulletin-prev-item" target="_blank" rel="noopener">
-                                    <span class="bpdate">19. apríla 2026</span>
+                                <?php foreach ( $bulletins as $oznam ) : ?>
+                                <a href="<?php echo esc_url( $oznam['url'] ); ?>" class="bulletin-prev-item" target="_blank" rel="noopener">
+                                    <span class="bpdate"><?php echo esc_html( $oznam['date'] ); ?></span>
                                     <span class="bpdl">
                                         PDF
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                                     </span>
                                 </a>
-                                <a href="oznamy/oznamy-2026-04-12.pdf" class="bulletin-prev-item" target="_blank" rel="noopener">
-                                    <span class="bpdate">12. apríla 2026</span>
-                                    <span class="bpdl">
-                                        PDF
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                                    </span>
-                                </a>
-                                <a href="oznamy/oznamy-2026-04-05.pdf" class="bulletin-prev-item" target="_blank" rel="noopener">
-                                    <span class="bpdate">5. apríla 2026</span>
-                                    <span class="bpdl">
-                                        PDF
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                                    </span>
-                                </a>
+                                <?php endforeach; ?>
                             </div>
                             </div>
+                            <?php endif; ?>
                         </div>
                     </article>
+                    <?php endif; ?>
 
                 </div>
 

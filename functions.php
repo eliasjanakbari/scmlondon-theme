@@ -252,6 +252,88 @@ function scm_get_pinned_news( $limit = 5 ) {
     ) );
 }
 
+/* ─────────────────────────────────────────────────────────────────────────
+ * Front-page "Nedeľné oznamy" (Sunday bulletin) — driven by a post tag.
+ *
+ * The admin publishes a post containing a link to the week's PDF and tags it
+ * "Nedeľné oznamy". The newest tagged post becomes the highlighted "latest
+ * edition"; the rest list under "Predchádzajúce vydania", newest first. The
+ * PDF link is taken from the first .pdf URL in the post content; the date shown
+ * is the post's publish date. Override the tag with the `scm_bulletin_tag`
+ * filter if needed.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/** Resolve the "Nedeľné oznamy" tag term, trying slug then name. Null if absent. */
+function scm_bulletin_term() {
+    $wanted = apply_filters( 'scm_bulletin_tag', 'Nedeľné oznamy' );
+
+    $term = get_term_by( 'slug', sanitize_title( $wanted ), 'post_tag' );
+    if ( ! $term ) {
+        $term = get_term_by( 'name', $wanted, 'post_tag' );
+    }
+    return $term ? $term : null;
+}
+
+/**
+ * The first PDF URL found in a post's content (the download link the admin added).
+ *
+ * @param WP_Post $post The bulletin post.
+ * @return string PDF URL, or '' if none found.
+ */
+function scm_bulletin_pdf_url( $post ) {
+    // Prefer an explicit <a href="...pdf"> link.
+    if ( preg_match( '/href=["\']([^"\']+\.pdf)["\']/i', $post->post_content, $m ) ) {
+        return $m[1];
+    }
+    // Fall back to a bare .pdf URL in the text.
+    if ( preg_match( '/https?:\/\/[^\s"\'<>]+\.pdf/i', $post->post_content, $m ) ) {
+        return $m[0];
+    }
+    return '';
+}
+
+/**
+ * Bulletin posts tagged "Nedeľné oznamy", newest first.
+ *
+ * Each entry: [ 'date' (Slovak j. F Y), 'url' (PDF), 'title' (post title) ].
+ * Posts without a resolvable PDF link are skipped.
+ *
+ * @param int $limit Max posts to fetch. Default 6.
+ * @return array[] Empty if the tag is missing or has no usable posts.
+ */
+function scm_get_bulletins( $limit = 6 ) {
+    $term = scm_bulletin_term();
+    if ( ! $term ) {
+        return array();
+    }
+
+    $posts = get_posts( array(
+        'post_type'           => 'post',
+        'post_status'         => 'publish',
+        'posts_per_page'      => (int) $limit,
+        'tax_query'           => array( array(
+            'taxonomy' => 'post_tag',
+            'field'    => 'term_id',
+            'terms'    => $term->term_id,
+        ) ),
+        'ignore_sticky_posts' => true,
+    ) );
+
+    $bulletins = array();
+    foreach ( $posts as $post ) {
+        $url = scm_bulletin_pdf_url( $post );
+        if ( ! $url ) {
+            continue;
+        }
+        $bulletins[] = array(
+            'date'  => get_the_date( 'j. F Y', $post ),
+            'url'   => $url,
+            'title' => get_the_title( $post ),
+        );
+    }
+    return $bulletins;
+}
+
 /**
  * Best image to represent a news post on the front page.
  *
