@@ -262,6 +262,7 @@ function getVisible() { return window.innerWidth <= 768 ? 1 : 2; }
 function buildDots() {
     const count = TOTAL_CARDS - getVisible() + 1;
     const container = document.getElementById('cardsDots');
+    if (!container) return;
     container.innerHTML = '';
     for (let i = 0; i < count; i++) {
         const btn = document.createElement('button');
@@ -274,12 +275,16 @@ function buildDots() {
 
 function slideCards(delta) {
     const vis = getVisible();
-    cardIdx = Math.max(0, Math.min(cardIdx + delta, TOTAL_CARDS - vis));
     const cardsTrack = document.getElementById('cardsTrack');
-    const step = cardsTrack.querySelector('.card').offsetWidth + 18;
+    const firstCard = cardsTrack && cardsTrack.querySelector('.card');
+    if (!cardsTrack || !firstCard) return;
+    cardIdx = Math.max(0, Math.min(cardIdx + delta, TOTAL_CARDS - vis));
+    const step = firstCard.offsetWidth + 18;
     cardsTrack.style.transform = 'translateX(-' + (cardIdx * step) + 'px)';
-    document.getElementById('cardsPrev').disabled = cardIdx === 0;
-    document.getElementById('cardsNext').disabled = cardIdx >= TOTAL_CARDS - vis;
+    const prev = document.getElementById('cardsPrev');
+    const next = document.getElementById('cardsNext');
+    if (prev) prev.disabled = cardIdx === 0;
+    if (next) next.disabled = cardIdx >= TOTAL_CARDS - vis;
     document.querySelectorAll('#cardsDots .hero-dot').forEach((d, i) =>
         d.classList.toggle('active', i === cardIdx));
 }
