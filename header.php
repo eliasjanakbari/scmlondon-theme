@@ -16,6 +16,26 @@ $theme_uri = get_template_directory_uri();
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
     <script>
+        /* Stop Google Translate from auto-applying English on load.
+           Google persists a `googtrans` cookie once you translate, then
+           re-applies it on every later visit. Clear it before the widget
+           initialises so the site always loads in the default language;
+           it is only set again when the Translate button is clicked. */
+        (function clearGoogTrans() {
+            var host = location.hostname;
+            var domains = ['', '.' + host, host];
+            // also clear for the bare domain (e.g. .example.com)
+            var bare = host.split('.').slice(-2).join('.');
+            domains.push('.' + bare, bare);
+            var paths = ['/', location.pathname];
+            domains.forEach(function (d) {
+                paths.forEach(function (p) {
+                    var c = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=' + p;
+                    document.cookie = c + (d ? '; domain=' + d : '');
+                });
+            });
+        })();
+
         function googleTranslateElementInit() {
             new google.translate.TranslateElement({
                 pageLanguage: 'sk',
