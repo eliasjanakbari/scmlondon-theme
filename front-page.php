@@ -121,7 +121,7 @@ $theme_uri = get_template_directory_uri();
                             </div>
                         </div>
                         <div class="bulletin-body">
-                            <a href="<?php echo esc_url( $latest_oznam['url'] ); ?>" class="bulletin-latest" target="_blank" rel="noopener" title="<?php echo esc_attr( 'Otvoriť bulletin ' . $latest_oznam['date'] ); ?>">
+                            <a href="<?php echo esc_url( $latest_oznam['url'] ); ?>" class="bulletin-latest" target="_blank" rel="noopener" title="<?php echo esc_attr( 'Otvoriť bulletin ' . $latest_oznam['title'] ); ?>">
                                 <div class="bulletin-latest-icon">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
@@ -129,7 +129,7 @@ $theme_uri = get_template_directory_uri();
                                     </svg>
                                 </div>
                                 <div class="bulletin-latest-info">
-                                    <span class="bdate"><?php echo esc_html( $latest_oznam['date'] ); ?></span>
+                                    <span class="bdate"><?php echo esc_html( $latest_oznam['title'] ); ?></span>
                                     <span class="blabel">Najnovšie vydanie</span>
                                 </div>
                                 <div class="bulletin-dl-icon">
@@ -147,7 +147,7 @@ $theme_uri = get_template_directory_uri();
                             <div class="bulletin-prev-list">
                                 <?php foreach ( $bulletins as $oznam ) : ?>
                                 <a href="<?php echo esc_url( $oznam['url'] ); ?>" class="bulletin-prev-item" target="_blank" rel="noopener">
-                                    <span class="bpdate"><?php echo esc_html( $oznam['date'] ); ?></span>
+                                    <span class="bpdate"><?php echo esc_html( $oznam['title'] ); ?></span>
                                     <span class="bpdl">
                                         PDF
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
