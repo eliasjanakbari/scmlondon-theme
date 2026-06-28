@@ -61,6 +61,17 @@ function scmnew_default_nav() {
  * missing/empty location assignment.
  */
 function scmnew_header_nav() {
+    // TEMP DIAGNOSTIC: print every menu (name | slug | item count) as an HTML
+    // comment so we can see the real menu name. Remove once the nav works.
+    $debug = "\n<!-- SCM MENU DEBUG\n";
+    foreach ( wp_get_nav_menus() as $m ) {
+        $debug .= sprintf( "menu: name=%s | slug=%s | id=%d | items=%d\n", $m->name, $m->slug, $m->term_id, (int) $m->count );
+    }
+    $locs = get_nav_menu_locations();
+    $debug .= 'locations: ' . wp_json_encode( $locs ) . "\n";
+    $debug .= "-->\n";
+    echo $debug; // phpcs:ignore
+
     $base = array(
         'container'   => false,
         'menu_class'  => 'nav-links',
