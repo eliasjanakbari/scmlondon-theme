@@ -740,6 +740,13 @@ $theme_uri = get_template_directory_uri();
             transition: transform 0.4s ease, opacity 0.3s;
         }
         .podcast-thumb:hover img { transform: scale(1.03); opacity: 0.85; }
+        .podcast-thumb iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%; height: 100%;
+            border: 0;
+            display: block;
+        }
         .podcast-play {
             position: absolute;
             top: 50%; left: 50%;

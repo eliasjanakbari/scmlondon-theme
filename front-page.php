@@ -308,12 +308,10 @@ $theme_uri = get_template_directory_uri();
 
                 <div class="odporucame-card">
                     <div class="odporucame-app">
-                        <img class="odporucame-app-icon" src="<?php echo esc_url( $theme_uri . '/images/DinDonDan.jpg' ); ?>" alt="DinDonDan">
                         <p class="odporucame-app-text">
-                            Mobilná aplikácia s názvom <strong>„DinDonDan"</strong>
-                            (<a href="https://play.google.com/store/apps/details?id=it.agesci.dindondanapp" target="_blank" rel="noopener">Android</a>,
-                            <a href="https://apps.apple.com/it/app/dindondanapp/id1447418501" target="_blank" rel="noopener">iOS</a>)
-                            obsahuje všetky kostoly Ríma s časmi omší (Messe) a otvorenia (Apertura).
+                            Webová stránka
+                            <a href="https://weekdaymasses.org.uk/en/day/H/area/london" target="_blank" rel="noopener">weekdaymasses.org.uk</a>
+                            obsahuje časy sv. omší v Londýne.
                         </p>
                     </div>
                 </div>
@@ -331,19 +329,13 @@ $theme_uri = get_template_directory_uri();
                 </div>
 
                 <div class="odporucame-card">
-                    <p class="odporucame-card-title">Podcast</p>
-                    <a class="podcast-thumb"
-                       href="https://www.youtube.com/watch?v=TaAwmuuJgwY"
-                       target="_blank" rel="noopener" aria-label="Pozrieť podcast na YouTube">
-                        <img src="https://img.youtube.com/vi/TaAwmuuJgwY/hqdefault.jpg" alt="SCM London Podcast">
-                        <div class="podcast-play">
-                            <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                        </div>
-                        <div class="podcast-label">
-                            <svg viewBox="0 0 24 24" width="12" height="12" fill="#fff"><path d="M23 7s-.3-2-1.2-2.8c-1.1-1.2-2.4-1.2-3-1.3C16.6 2.8 12 2.8 12 2.8s-4.6 0-6.8.1c-.6.1-1.9.1-3 1.3C1.3 5 1 7 1 7S.7 9.1.7 11.2v2c0 2.1.3 4.2.3 4.2s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.4 21.6 12 21.6 12 21.6s4.6 0 6.8-.2c.6-.1 1.9-.1 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.1.3-4.2v-2C23.3 9.1 23 7 23 7z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#ff0000"/></svg>
-                            Pozrieť na YouTube
-                        </div>
-                    </a>
+                    <p class="odporucame-card-title">Biblia za Rok</p>
+                    <div class="podcast-thumb">
+                        <iframe src="https://www.youtube.com/embed/videoseries?list=PLwpaMZy3kz67gASdbTxHJu1M9aolPdL3E"
+                                title="Biblia za Rok" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
                 </div>
 
             </div>
