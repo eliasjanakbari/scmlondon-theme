@@ -34,8 +34,8 @@ $theme_uri = get_template_directory_uri();
     </div>
 
     <div class="hero-caption">
-        <h1>Vitajte v Slovenskej katolíckej misii</h1>
-        <p>Velehrad London · Spoločenstvo slovenských a českých katolíkov</p>
+        <h1>Vitajte v Slovenskej katolíckej misii v Londýne</h1>
+        <p>Spoločenstvo slovenských a českých katolíkov</p>
     </div>
 
     <button class="hero-arrow hero-prev" onclick="slideTo(cur - 1)" aria-label="Predchádzajúci">
