@@ -308,22 +308,22 @@ $theme_uri = get_template_directory_uri();
 
                 <div class="odporucame-card">
                     <div class="odporucame-app">
-                        <p class="odporucame-app-text">
-                            Webová stránka
-                            <a href="https://weekdaymasses.org.uk/en/day/H/area/london" target="_blank" rel="noopener">weekdaymasses.org.uk</a>
-                            obsahuje časy sv. omší v Londýne.
-                        </p>
-                    </div>
-                </div>
-
-                <div class="odporucame-card">
-                    <div class="odporucame-app">
                         <img class="odporucame-app-icon" src="<?php echo esc_url( $theme_uri . '/images/Missa.jpg' ); ?>" alt="Missa">
                         <p class="odporucame-app-text">
                             Mobilná aplikácia s názvom <strong>„Missa"</strong>
                             (<a href="https://play.google.com/store/apps/details?id=sk.tkkbs.missa" target="_blank" rel="noopener">Android</a>,
                             <a href="https://apps.apple.com/sk/app/missa/id1449574141" target="_blank" rel="noopener">iOS</a>)
                             obsahuje celý text sv. omše na daný deň v slovenčine. Dá sa použiť pri účasti na sv. omši v taliančine a v iných jazykoch. Sú v nej nielen liturgické čítania zo dňa, ale aj všetky texty sv. omše, vypísané zaradom.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="odporucame-card">
+                    <div class="odporucame-app">
+                        <p class="odporucame-app-text">
+                            Webová stránka
+                            <a href="https://weekdaymasses.org.uk/en/day/H/area/london" target="_blank" rel="noopener">weekdaymasses.org.uk</a>
+                            obsahuje časy sv. omší v Londýne.
                         </p>
                     </div>
                 </div>
