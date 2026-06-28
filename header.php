@@ -1018,15 +1018,26 @@ $theme_uri = get_template_directory_uri();
 
         <?php scmnew_header_nav(); ?>
 
-        <button class="btn-translate" onclick="triggerTranslate()" title="Translate entire site to English">
-            <svg class="uk-flag" viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg">
+        <button class="btn-translate" id="btn-translate" data-lang="sk" onclick="toggleTranslate()" title="Translate entire site to English">
+            <!-- UK flag — shown while site is in Slovak (click to go EN) -->
+            <svg class="uk-flag flag-en" viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg">
                 <rect width="60" height="30" fill="#012169"/>
                 <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/>
                 <path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="4"/>
                 <path d="M30,0 V30 M0,15 H60" stroke="#fff" stroke-width="10"/>
                 <path d="M30,0 V30 M0,15 H60" stroke="#C8102E" stroke-width="6"/>
             </svg>
-            EN
+            <!-- SK flag — shown while site is in English (click to go back) -->
+            <svg class="uk-flag flag-sk" viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg" style="display:none">
+                <rect width="60" height="40" fill="#fff"/>
+                <rect width="60" height="13.33" y="13.33" fill="#0b4ea2"/>
+                <rect width="60" height="13.34" y="26.66" fill="#ee1c25"/>
+                <g transform="translate(8,8)">
+                    <path d="M1,0 H17 V12 C17,20 9,25 9,25 C9,25 1,20 1,12 Z" fill="#ee1c25" stroke="#fff" stroke-width="1.5"/>
+                    <path d="M8,4 H10 V7 H13.5 V9 H10 V11 H12.5 V13 H10 V19 H8 V13 H5.5 V11 H8 V9 H4.5 V7 H8 Z" fill="#fff"/>
+                </g>
+            </svg>
+            <span class="lang-label">EN</span>
         </button>
 
         <button class="hamburger" id="hamburger" onclick="toggleNav()" aria-label="Menu">

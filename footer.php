@@ -390,7 +390,19 @@ document.addEventListener('keydown', function(e) {
 /* ═══════════════════════════════════════
    GOOGLE TRANSLATE
 ═══════════════════════════════════════ */
-function triggerTranslate() {
+function toggleTranslate() {
+    const btn = document.getElementById('btn-translate');
+    if (!btn) return;
+
+    if (btn.dataset.lang === 'en') {
+        // Currently English -> revert to the original Slovak.
+        // The googtrans cookie is cleared on load, so reloading
+        // brings the page back in its default language.
+        location.reload();
+        return;
+    }
+
+    // Default Slovak -> translate the whole site to English (live, no reload).
     const attempt = () => {
         const sel = document.querySelector('.goog-te-combo');
         if (sel) {
@@ -401,6 +413,13 @@ function triggerTranslate() {
         }
     };
     attempt();
+
+    // Flip the button to its "SK / back to Slovak" state.
+    btn.dataset.lang = 'en';
+    btn.querySelector('.flag-en').style.display = 'none';
+    btn.querySelector('.flag-sk').style.display = 'block';
+    btn.querySelector('.lang-label').textContent = 'SK';
+    btn.title = 'Zobraziť pôvodný jazyk (slovenčina)';
 }
 </script>
 
