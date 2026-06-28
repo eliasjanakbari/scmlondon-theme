@@ -101,7 +101,7 @@ $theme_uri = get_template_directory_uri();
                     <?php endif; ?>
 
                     <?php
-                    $bulletins      = scm_get_bulletins( 6 );
+                    $bulletins      = scm_get_bulletins( 4 );
                     $latest_oznam   = ! empty( $bulletins ) ? array_shift( $bulletins ) : null;
                     ?>
                     <?php if ( $latest_oznam ) : ?>
