@@ -47,3 +47,56 @@ function scmnew_default_nav() {
     }
     echo '</ul>';
 }
+
+/**
+ * Render the header navigation as robustly as possible.
+ *
+ * Order of preference:
+ *   1. The menu assigned to the `header-pages` location (the WP-standard way).
+ *   2. A menu literally named/slugged "dobrodinci", resolved directly — used
+ *      when the location assignment isn't taking effect for whatever reason.
+ *   3. The built-in default list, so the nav is never empty.
+ *
+ * This makes the bar dynamic from Appearance → Menus while staying immune to a
+ * missing/empty location assignment.
+ */
+function scmnew_header_nav() {
+    $base = array(
+        'container'   => false,
+        'menu_class'  => 'nav-links',
+        'menu_id'     => 'navLinks',
+        'depth'       => 2,
+        'fallback_cb' => false,
+        'echo'        => false,
+    );
+
+    // 1. Try the assigned location.
+    $nav = wp_nav_menu( array_merge( $base, array( 'theme_location' => 'header-pages' ) ) );
+
+    // 2. Fall back to a menu found by name/slug (default: dobrodinci).
+    if ( ! scmnew_nav_has_items( $nav ) ) {
+        $wanted = apply_filters( 'scmnew_header_menu_name', 'dobrodinci' );
+        $target = '';
+        foreach ( wp_get_nav_menus() as $menu ) {
+            if ( 0 === strcasecmp( $menu->name, $wanted ) || $menu->slug === sanitize_title( $wanted ) ) {
+                $target = $menu->term_id;
+                break;
+            }
+        }
+        if ( $target ) {
+            $nav = wp_nav_menu( array_merge( $base, array( 'menu' => $target ) ) );
+        }
+    }
+
+    // 3. Output, or fall back to the built-in list.
+    if ( scmnew_nav_has_items( $nav ) ) {
+        echo $nav; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_nav_menu output is already escaped.
+    } else {
+        scmnew_default_nav();
+    }
+}
+
+/** True only when a wp_nav_menu() string actually contains list items. */
+function scmnew_nav_has_items( $nav ) {
+    return is_string( $nav ) && false !== strpos( $nav, '<li' );
+}

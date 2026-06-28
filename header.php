@@ -954,16 +954,7 @@ $theme_uri = get_template_directory_uri();
             </div>
         </a>
 
-        <?php
-        wp_nav_menu( array(
-            'theme_location'  => 'header-pages',
-            'container'       => false,
-            'menu_class'      => 'nav-links',
-            'menu_id'         => 'navLinks',
-            'fallback_cb'     => 'scmnew_default_nav',
-            'depth'           => 1,
-        ) );
-        ?>
+        <?php scmnew_header_nav(); ?>
 
         <button class="btn-translate" onclick="triggerTranslate()" title="Translate entire site to English">
             <svg class="uk-flag" viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg">
