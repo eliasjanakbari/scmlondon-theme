@@ -269,6 +269,53 @@ function scm_ids_from_meta_value( $value ) {
     return $ids;
 }
 
+/**
+ * TEMPORARY diagnostic — remove once the Robo Gallery meta key is identified.
+ *
+ * Visit any front-end URL while logged in as an admin with ?scm_gallery_debug=1
+ * appended, e.g.  https://your-site/?scm_gallery_debug=1
+ * It prints every meta key on the gallery post plus a preview of each value,
+ * so we can see exactly where Robo Gallery stores the image IDs.
+ */
+function scm_gallery_debug() {
+    if ( empty( $_GET['scm_gallery_debug'] ) || ! current_user_can( 'manage_options' ) ) {
+        return;
+    }
+
+    $gallery_id = scm_master_gallery_id();
+    header( 'Content-Type: text/plain; charset=utf-8' );
+
+    echo "=== SCM gallery debug for post ID {$gallery_id} ===\n\n";
+
+    $post = get_post( $gallery_id );
+    echo 'Post exists: ' . ( $post ? "yes (type={$post->post_type}, title=\"{$post->post_title}\")" : 'NO' ) . "\n";
+
+    $children = get_posts( array(
+        'post_type'      => 'attachment',
+        'post_mime_type' => 'image',
+        'post_parent'    => $gallery_id,
+        'numberposts'    => -1,
+        'fields'         => 'ids',
+    ) );
+    echo 'Child image attachments (post_parent): ' . count( $children ) . "\n\n";
+
+    echo "--- post meta ---\n";
+    foreach ( get_post_meta( $gallery_id ) as $key => $values ) {
+        foreach ( (array) $values as $raw ) {
+            $val     = maybe_unserialize( $raw );
+            $ids     = scm_ids_from_meta_value( $val );
+            $preview = is_scalar( $val ) ? substr( (string) $val, 0, 200 ) : wp_json_encode( $val );
+            echo "[{$key}]\n";
+            echo '  type: ' . gettype( $val ) . ( is_array( $val ) ? ' (count=' . count( $val ) . ')' : '' ) . "\n";
+            echo '  ids found: ' . ( $ids ? implode( ',', $ids ) : '(none)' ) . "\n";
+            echo '  preview: ' . substr( (string) $preview, 0, 300 ) . "\n\n";
+        }
+    }
+
+    exit;
+}
+add_action( 'template_redirect', 'scm_gallery_debug' );
+
 /** Bust the cached gallery whenever its post is saved/deleted. */
 function scm_flush_gallery_cache( $post_id ) {
     if ( (int) $post_id === scm_master_gallery_id() ) {
