@@ -207,9 +207,9 @@ $theme_uri = get_template_directory_uri();
                     </div>
                     <div class="s-card-body">
                         <ul class="mass-list">
-                            <li><span class="day">Nedeľa (SK)</span><span class="time">11:00</span></li>
+                            <li><span class="day">Nedeľa (SK)</span><span class="time">14:00</span></li>
                             <li><span class="day">Nedeľa (EN)</span><span class="time">09:30</span></li>
-                            <li><span class="day">Streda</span><span class="time">19:00</span></li>
+                            <li><span class="day">Piatok</span><span class="time">19:30</span></li>
                             <li><span class="day">Sviatky</span><span class="time">podľa programu</span></li>
                         </ul>
                         <a href="#" class="btn-primary" style="margin-top:14px;">Celý program bohoslužieb</a>
